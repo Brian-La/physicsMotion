@@ -29,12 +29,14 @@ public:
 
 
 	// local data define here
-    ofVec3f velocity = ofVec3f(rotation, 0, 0);       //velocity vecs
-    ofVec3f accel = ofVec3f(0, 0, 0);        //acceleration vec
-    ofVec3f force = ofVec3f(0, 0, 0);        //force
+    ofVec3f veloc;       //velocity vecs
+    ofVec3f accel;        //acceleration vec
+    ofVec3f force;        //force
+
+	float degVeloc, degAccel, degForce;		//angle parameters
 	
-    float damp = 0.9;     //damping value (drag)
-    float mass = 1;     //mass
+    float damp = 0.99;     //damping value (drag)
+    float mass = 0.5;     //mass
 };
 
 
@@ -62,7 +64,7 @@ class ofApp : public ofBaseApp{
 		// application data
 	
 		glm::vec3 lastMouse;   // location of where mouse moved last (when dragging)
-
+		
 		// UI control data
 		//
 		bool bFullscreen = false;	

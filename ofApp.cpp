@@ -55,30 +55,33 @@ void ofApp::setup(){
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void ofApp::update() {
+
+	//at each frame, update each particle
 	if (startAnim) {
-        //at each frame, update particle
-        //new position based on velocity and time step
-            //position = position + velocity * dt <- time interval between each frame
-        tri.pos += (tri.velocity * 1/ofGetFrameRate());
-        //compute accleration from forces using
-            //acceleration = (1/m) * f
-        //add to existing acceleration
-        tri.accel = (1 / tri.mass) * tri.force;    //tri.force = 0?
         
-        //cout << "accel: " << tri.accel << endl;
-        //compute velocity based on total acceleration and time step
-            //velocity = velocity + acceleration * dt
-        tri.velocity += (tri.accel * 1/ofGetFrameRate());
-        //damp velocity
-            //velocity = velocity * damping
-        tri.velocity *= tri.damp;
-        //cout << "vel: " << tri.velocity << endl;
-        //set forces to 0
-        if(tri.velocity == ofVec3f(0, 0, 0))
-            tri.force = ofVec3f(0, 0, 0);
-        
-        cout << tri.velocity << endl;
+		//compute new position based on velocity and time step
+		tri.pos += tri.veloc * (1 / ofGetFrameRate());		//position = position + velocity * dt
+		tri.rotation += tri.degVeloc * (1 / ofGetFrameRate());	//repeat for angle via one-dimension
+		
+		//compute acceleration from forces on particle using a = (1/m) * f
+		//add to existing particle acceleration
+		tri.accel = (1 / tri.mass) * tri.force;		
+		tri.degAccel = (1 / tri.mass) * tri.degForce;
+
+		//compute new velocity based on total acceleration and time step
+			//Velocity = velocity + acceleration * dt
+		tri.veloc += tri.accel * (1 / ofGetFrameRate());
+		tri.degVeloc += tri.degAccel * (1 / ofGetFrameRate());
+
+		//damp velocity
+			//Velocity = velocity * damping
+		tri.veloc *= tri.damp;
+		tri.degVeloc *= tri.damp;
+		
+
+		//set forces on particle to zero upon key release
+		
 	}
 
 
@@ -117,18 +120,25 @@ void ofApp::keyPressed(int key){
 		bCtrlKeyDown = true;
 		break;
 	case OF_KEY_LEFT:   // turn left
+		tri.degForce = 50;
 		break;
 	case OF_KEY_RIGHT:  // turn right
+		tri.degForce = -50;
 		break;
 	case OF_KEY_UP:     // go forward
-        tri.force += ofVec3f(0, 10, 0);
+		tri.degVeloc = 0;		//freeze rotation if move
+		tri.force = ofVec3f(-sin(tri.rotation * PI/180) * 50, 
+			cos(tri.rotation * PI/180) * 50, 0);		//convert rotation to deg to calculate..
+														//..force direction
 		break;
 	case OF_KEY_DOWN:   // go backward
-        tri.force += ofVec3f(0, -10, 0);
+		tri.degVeloc = 0;		
+		tri.force = ofVec3f(sin(tri.rotation * PI / 180) * 50, 
+			-cos(tri.rotation * PI / 180) * 50, 0);	//inverse
 		break;
 	case ' ':
 		startAnim = !startAnim;
-        cout << "Physics Switched" << endl;
+		cout << "Physics Toggled" << endl;
 		break;
 	default:
 		break;
@@ -140,17 +150,18 @@ void ofApp::keyReleased(int key){
 	switch (key) {
 	case OF_KEY_CONTROL:
 		bCtrlKeyDown = false;
-            cout << tri.rotation << endl;
 		break;
 	case OF_KEY_LEFT:   // turn left
+		tri.degForce = 0;
 		break;
 	case OF_KEY_RIGHT:  // turn right
+		tri.degForce = 0;
 		break;
 	case OF_KEY_UP:     // go forward
-        tri.force += ofVec3f(0, -5, 0);
+		tri.force = ofVec3f(0, 0, 0);
 		break;
 	case OF_KEY_DOWN:   // go backward
-        tri.force += ofVec3f(0, 5, 0);
+		tri.force = ofVec3f(0, 0, 0);
 		break;
 	default:
 		break;
